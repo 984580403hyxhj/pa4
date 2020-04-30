@@ -57,7 +57,7 @@ Tnode *c_clock_rotate(Tnode *head)
 	return temp;
 }
 
-Tnode *rotate(Tnode *head)
+Tnode *rotate(Tnode *head, int *ifchange)
 {
 	if(head->balance > 1)///l rotate
 	{
@@ -66,6 +66,14 @@ Tnode *rotate(Tnode *head)
 			Tnode *temp = clock_rotate(head);
 			temp->balance = 0;
 			temp->right->balance = 0;
+			return temp;
+		}
+		if(head->left->balance == 0)
+		{
+			Tnode *temp = clock_rotate(head);
+			temp->balance = -1;
+			temp->right->balance = 1;
+			*ifchange = 0;
 			return temp;
 		}
 		if(head->left->balance < 0)//lr
@@ -103,6 +111,13 @@ Tnode *rotate(Tnode *head)
 			Tnode *temp = c_clock_rotate(head);
 			temp->balance = 0;
 			temp->left->balance = 0;
+			return temp;
+		}
+		if(head->right->balance == 0){
+			Tnode *temp = c_clock_rotate(head);
+			temp->balance = 1;
+			temp->left->balance = -1;
+			*ifchange = 0;
 			return temp;
 		}
 		if(head->right->balance > 0)//rl
@@ -201,7 +216,7 @@ Tnode *insertnode(Tnode *head, int key, int *ifchange)
 	
 	if(head->balance < -1 || head->balance > 1)
 	{
-		head = rotate(head);
+		head = rotate(head, ifchange);
 		*ifchange = 0;
 	}
 	/*print2D(head);
@@ -247,8 +262,8 @@ Tnode *deletetoright(Tnode *head, int *ifchange)
 	}
 	if(head->balance < -1 || head->balance > 1)
 	{
-		head = rotate(head);
-		*ifchange = 1;
+		head = rotate(head, ifchange);
+		//*ifchange = 1;
 	}
 
 	return head;
@@ -294,7 +309,7 @@ Tnode *delete(Tnode *head, int key, int *ifchange)
 				
 				if(head->balance < -1 || head->balance > 1)
 				{
-					head = rotate(head);
+					head = rotate(head, ifchange);
 				}
 
 				return head;
@@ -350,8 +365,8 @@ Tnode *delete(Tnode *head, int key, int *ifchange)
 
 	if(head->balance < -1 || head->balance > 1)
 	{
-		head = rotate(head);
-		*ifchange = 1;
+		head = rotate(head, ifchange);
+		//*ifchange = 1;
 	}
 
 	return head;
@@ -385,8 +400,8 @@ Tnode *buildtree(char *filename)
 			head = delete(head,key, ifchange);
 			*ifchange = 0;
 		}
-		/*printf("%d, %c\n",key,ascii);
-		print2D(head);
+		//printf("%d, %c\n",key,ascii);
+		/*print2D(head);
 		//printf("////////////////////////////////////\n");
 		printf("////////////////////////////////////////");*/
 	}
@@ -401,7 +416,7 @@ Tnode *buildtree(char *filename)
 
 /////below is -e section
 
-Tnode *preorder_tr(FILE *fp, int *first, int *second, int *third)
+Tnode *preorder_tr(FILE *fp, int *first, int *second, int *third, int *total)
 {
 	if(feof(fp)) return NULL;
 	int key = 0;
@@ -409,11 +424,13 @@ Tnode *preorder_tr(FILE *fp, int *first, int *second, int *third)
 	fread(&key,sizeof(int),1,fp);
 	fread(&pat,sizeof(char),1,fp);
 
+	*total = *total + 1;
+
 	Tnode *p = createNode(key);
 	if(pat == 0) return p;
 	if(pat == 1)
 	{
-		p->right = preorder_tr(fp, first, second, third);
+		p->right = preorder_tr(fp, first, second, third, total);
 		if(p->right->key < p->key)
 		{
 			*second = 0;
@@ -421,7 +438,7 @@ Tnode *preorder_tr(FILE *fp, int *first, int *second, int *third)
 	}
 	else if(pat == 2)
 	{
-		p->left = preorder_tr(fp, first, second, third);
+		p->left = preorder_tr(fp, first, second, third, total);
 		if(p->left->key > p->key)
 		{
 			*second = 0;
@@ -429,8 +446,8 @@ Tnode *preorder_tr(FILE *fp, int *first, int *second, int *third)
 	}
 	else if(pat == 3)
 	{
-		p->left = preorder_tr(fp, first, second, third);
-		p->right = preorder_tr(fp, first, second, third);
+		p->left = preorder_tr(fp, first, second, third, total);
+		p->right = preorder_tr(fp, first, second, third, total);
 		if(p->right->key < p->key)
 		{
 			*second = 0;

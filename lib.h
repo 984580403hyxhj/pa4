@@ -5,7 +5,7 @@
 
 Tnode *buildtree(char *filename);
 
-Tnode *preorder_tr(FILE *fp, int *first, int *second, int *third);
+Tnode *preorder_tr(FILE *fp, int *first, int *second, int *third, int *total);
 
 void print2D(Tnode *root);
 
