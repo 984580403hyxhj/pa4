@@ -33,6 +33,7 @@ void freetree(Tnode *head)
     free(head);
 }
 
+
 int main(int argc, char** argv)
 {
     
@@ -41,7 +42,7 @@ int main(int argc, char** argv)
         Tnode *treehead = buildtree(argv[2]);
         FILE *output = fopen(argv[3],"wb+");
         if(output == NULL) return EXIT_FAILURE;
-
+        //print2D(treehead);
         preorder(treehead,output);
         fclose(output);
         freetree(treehead);
@@ -59,6 +60,7 @@ int main(int argc, char** argv)
         }
         Tnode *head = preorder_tr(eval,&first,&second,&third);
         printf("%d,%d,%d\n",first,second,third);
+        //print2D(head);
         freetree(head);
         fclose(eval);
         if(first != 1) return EXIT_FAILURE;
