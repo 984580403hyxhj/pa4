@@ -390,7 +390,7 @@ Tnode *buildtree(char *filename)
 		//printf("////////////////////////////////////\n");
 		printf("////////////////////////////////////////");*/
 	}
-
+	free(ifchange);
 	fclose(fp);
 	return head;
 
